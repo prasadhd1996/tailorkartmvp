@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("CUSTOMER")
+  phone     String?
+  createdAt DateTime @default(now())
+  orders    Order[]
+}
+
+model Design {
+  id             String   @id @default(cuid())
+  name           String
+  category       String
+  description    String
+  basePrice      Float
+  imageUrl       String
+  images         String   @default("[]")
+  fabricOptions  String   @default("[]")
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  orders         Order[]
+}
+
+model Order {
+  id               String    @id @default(cuid())
+  userId           String
+  designId         String
+  status           String    @default("RECEIVED")
+  measurements     String
+  fabricChoice     String
+  colorPreference  String
+  deliveryDate     DateTime
+  specialNotes     String?
+  totalPrice       Float
+  adminNotes       String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  user             User      @relation(fields: [userId], references: [id])
+  design           Design    @relation(fields: [designId], references: [id])
+}
