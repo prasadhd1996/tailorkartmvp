@@ -29,8 +29,28 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deploy on Vercel (with Turso)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Locally the app uses the `dev.db` SQLite file. In production it uses a hosted
+[Turso](https://turso.tech) (libSQL) database whenever `TURSO_DATABASE_URL` is set.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Create the database (free):** sign up at https://app.turso.tech, create a
+   database, then copy its URL (`libsql://...turso.io`) and create a database token.
+2. **Import the repo:** at https://vercel.com/new import this GitHub repo
+   (framework preset: Next.js, no other settings needed).
+3. **Set environment variables** in the import screen (or Project → Settings →
+   Environment Variables):
+
+   | Name | Value |
+   | --- | --- |
+   | `TURSO_DATABASE_URL` | `libsql://<your-db>.turso.io` |
+   | `TURSO_AUTH_TOKEN` | the database token |
+   | `NEXTAUTH_SECRET` | any long random string (e.g. `openssl rand -base64 32`) |
+
+4. **Deploy.** The `vercel-build` script applies the migrations in
+   `prisma/migrations` to Turso (`scripts/migrate-turso.mjs`), seeds demo data
+   if the database is empty, then builds. Vercel gives you a public URL like
+   `https://tailorkartmvp.vercel.app`.
+
+Demo logins created by the seed (change these before real use):
+`admin@tailorkart.com` / `admin123` and `priya@example.com` / `customer123`.

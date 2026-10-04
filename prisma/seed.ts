@@ -1,11 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import bcrypt from "bcryptjs";
-import path from "path";
+import { createAdapter } from "../lib/db-adapter";
 
-const dbPath = path.resolve(__dirname, "../dev.db");
-const adapter = new PrismaBetterSqlite3({ url: dbPath });
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient({ adapter: createAdapter() });
 
 const designs = [
   {
@@ -115,6 +112,11 @@ const designs = [
 ];
 
 async function main() {
+  if ((await prisma.design.count()) > 0) {
+    console.log("Database already has designs, skipping seed.");
+    return;
+  }
+
   console.log("Seeding database...");
 
   const adminPassword = await bcrypt.hash("admin123", 12);
